@@ -141,6 +141,7 @@ class request:
     rstring = ''
     
     url = urllib.quote(url, safe="%/:=&?~#+!$,;'@()*[]")
+    print url
     if data:
       data = self.genData(data)
     else:
@@ -227,7 +228,6 @@ class sqlenum:
 	if o in ("-c", "-cookie"):
 	  cookiepath = a
     
-  
   
     if urllib2.getproxies():
       print '+ Using HTTP proxy ' + urllib2.getproxies()['http']
