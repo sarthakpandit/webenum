@@ -166,7 +166,7 @@ class sqlenum:
     t=[]
     
     try:
-	opts, args = getopt.getopt(sys.argv[1:-1], 'q:w:m:v:d:h:c:', ['quantity', 'wordlist', 'match', 'verbose', 'data', 'headers', 'cookie'])
+	opts, args = getopt.getopt(sys.argv[1:-1], 'w:m:v:d:h:c:', ['wordlist', 'match', 'verbose', 'data', 'headers', 'cookie'])
     except getopt.error, msg:
 	print "Error:", msg
 	exit(2)
@@ -229,6 +229,7 @@ class sqlenum:
 	if f[2:5] == 'INT':
 	  nums.append(f[5:-2].split(':'))
       
+      print type(nums)
       ranges = [range(int(n), int(a)) for n,a in nums]
       
       for n in ranges:
