@@ -58,21 +58,21 @@ class request:
     self.tokens.sort()
     self.fword=len(self.tokens)
 
-    self.tokens += list(re.findall('%%INT\d*:?\d+%%',self.url)) + list(re.findall('%%INT\d*:?\d+%%',self.data))
+    self.tokens += list(re.findall('%%INT\d*(?:\:\d+)?%%',self.url)) + list(re.findall('%%INT\d*(?:\:\d+)?%%',self.data))
     for h in headers:
-      self.tokens += list(re.findall('%%INT\d*:?\d+%%',headers[h]))
+      self.tokens += list(re.findall('%%INT\d*(?:\:\d+)?%%',headers[h]))
     
     self.fint=len(self.tokens)-self.fword
 
-    self.tokens += list(re.findall('%%CHAR\w+:?\w*%%',self.url)) + list(re.findall('%%CHAR\w+:?\w*%%',self.data))
+    self.tokens += list(re.findall('%%CHAR\w*(?:\:\w+)?%%',self.url)) + list(re.findall('%%CHAR\w*(?:\:\w+)?%%',self.data))
     for h in headers:
-      self.tokens += list(re.findall('%%CHAR\w+:?\w*%%',headers[h]))
+      self.tokens += list(re.findall('%%CHAR\w*(?:\:\w+)?%%',headers[h]))
     
     self.fchar=len(self.tokens)-self.fword-self.fint  
       
-    self.tokens += list(re.findall('%%TABLE\d*:?\d+%%',self.url)) + list(re.findall('%%TABLE\d*:?\d+%%',self.data))
+    self.tokens += list(re.findall('%%TABLE\d*(?:\:\d+)?%%',self.url)) + list(re.findall('%%TABLE\d*(?:\:\d+)?%%',self.data))
     for h in headers:
-      self.tokens += list(re.findall('%%TABLE\d*:?\d+%%',headers[h]))
+      self.tokens += list(re.findall('%%TABLE\d*(?:\:\d+)?%%',headers[h]))
 
     self.ftable=len(self.tokens)-self.fword-self.fint-self.fchar
     
@@ -227,9 +227,16 @@ class sqlenum:
       nums=[]
       for f in self.req.tokens:
 	if f[2:5] == 'INT':
-	  nums.append(f[5:-2].split(':'))
+	  splitted=f[5:-2].split(':')
+	  
+	  if len(splitted)<2:
+	    if not splitted[0]:
+	      splitted=["0","50"]
+	    else:
+	      splitted=["0",splitted[0]]
+	  
+	  nums.append(splitted)
       
-      print type(nums)
       ranges = [range(int(n), int(a)) for n,a in nums]
       
       for n in ranges:
@@ -238,19 +245,26 @@ class sqlenum:
 	  lst.append(str(a))
 	i.append(lst)
       
-      
     
     if self.req.fchar:
       
       tosrc=[]
       for f in self.req.tokens:
 	if f[2:6] == 'CHAR':
-	  tosrc.append(f[6:-2].split(':'))
+	  splitted=f[6:-2].split(':')
+	  
+	  if len(splitted)<2:
+	    if not splitted[0]:
+	      splitted=["a","z"]
+	    else:
+	      splitted=["a"*len(splitted[0]),splitted[0]]
+	  
+	  print splitted
+	  tosrc.append(splitted)
       
       # rang()ing the combination from aa to bb
       for w1,w2 in tosrc:
 	ltrs = [list(re.findall(w1[n] + '\w*' + w2[n],string.printable)[0]) for n in range(len(w1))]
-	
 	
       # joining combination to form words aa ab bb ba ..
       ltrs2 = [''.join(l) for l in list(itertools.product(*ltrs))]
