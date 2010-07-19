@@ -280,14 +280,25 @@ class sqlenum:
       qnts=[]
       for f in self.req.tokens:
 	if f[2:7] == 'TABLE':
-	  qnts.append(f[7:-2].split(':'))
+	  splitted=f[7:-2].split(':')
 	  
-      for qnt in qnts:
-	table = []
-	for q in range(int(qnt[0]),int(qnt[1])+1):
-	  if q:
-	    table.append(('1,'*(q))[:-1])
-	t.append(table)
+	  if len(splitted)<2:
+	    if not splitted[0]:
+	      splitted=["0","50"]
+	    else:
+	      splitted=["0",splitted[0]]
+	  
+	  qnts.append(splitted)
+	  
+	  for qnt in qnts:
+	    table = []
+	    for q in range(int(qnt[0]),int(qnt[1])+1):
+	      if q:
+		table.append(('1,'*(q))[:-1])
+	    
+	  t.append(table)
+
+
 
     if not self.match:
       print '! Error, one match string required.'
