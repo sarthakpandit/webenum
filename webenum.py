@@ -178,7 +178,7 @@ class sqlenum:
 	if o in ("-m", "-match"):
 	  self.match=a
 	if o in ("-w", "-wordlist"):
-	  split_wlists = a.split(":")
+	  split_wlists.append(a)
 	if o in ("-v", "-verbose"):
 	  self.verbose = a
 	if o in ("-d", "-data"):
