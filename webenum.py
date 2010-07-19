@@ -248,28 +248,33 @@ class sqlenum:
     
     if self.req.fchar:
       
-      tosrc=[]
       for f in self.req.tokens:
 	if f[2:6] == 'CHAR':
 	  splitted=f[6:-2].split(':')
 	  
+	  tosrc=[]
 	  if len(splitted)<2:
 	    if not splitted[0]:
 	      splitted=["a","z"]
 	    else:
 	      splitted=["a"*len(splitted[0]),splitted[0]]
 	  
-	  print splitted
 	  tosrc.append(splitted)
-      
-      # rang()ing the combination from aa to bb
-      for w1,w2 in tosrc:
-	ltrs = [list(re.findall(w1[n] + '\w*' + w2[n],string.printable)[0]) for n in range(len(w1))]
 	
-      # joining combination to form words aa ab bb ba ..
-      ltrs2 = [''.join(l) for l in list(itertools.product(*ltrs))]
-      c.append(ltrs2)
-      
+	  # rang()ing the combination from aa to bb
+	  ltrs=[]
+	  for w1,w2 in tosrc:
+	    for n in range(len(w1)):
+	      founded = re.findall(w1[n] + '\w*' + w2[n],string.printable)
+	      if founded:
+		ltrs.append(list(founded)[0])
+	      else:
+		ltrs.append(w1)
+	      
+	  # joining combination to form words aa ab bb ba ..
+	  ltrs2 = [''.join(l) for l in list(itertools.product(*ltrs))]
+	  c.append(ltrs2)
+	  
     if self.req.ftable:
       
       qnts=[]
