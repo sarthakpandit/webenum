@@ -415,10 +415,14 @@ class sqlenum:
       try: 
 	response = self.req.Get(reqdata.url,reqdata.data,reqdata.h,self.randomize)
       except urllib2.HTTPError, e:
-	response=e.read()
-	if not response:
-	  self.errorlist[reqdata]=str(e)
-	status_code=e.code
+	try:
+	  response=e.read()
+	except Exception, e:
+	  self.errorlist[reqdata]="Error reading urllib2.HTTPError data"
+	else:
+	  if not response:
+	    self.errorlist[reqdata]=str(e)
+	  status_code=e.code
       except Exception, e:
 	print str(e)
 	self.errorlist[reqdata]=str(e)
