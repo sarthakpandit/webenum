@@ -221,7 +221,7 @@ class sqlenum:
     if sys.argv[-1][:4] == 'http':
       url=sys.argv[-1]
     else:
-      print '! Error, -u url required'
+      print '! Error, url required'
       print usage
       return -1      
   
