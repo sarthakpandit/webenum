@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<title>List Expander</title> 
+ 
+<link href="listexpander/listexpander.css" rel="stylesheet" type="text/css" media="screen" /> 
+<script type="text/javascript" src="jquery/jquery.js"></script> 
+<script type="text/javascript" src="result.js"></script> 
+
+ 
+<style> 
+
+
+body{
+	margin:0;
+	padding:0;
+	background:#f1f1f1;
+	font:70% Arial, Helvetica, sans-serif; 
+	color:#555;
+	line-height:150%;
+	text-align:left;
+}
+a{
+	text-decoration:none;
+	color:#057fac;
+}
+a:hover{
+	text-decoration:none;
+	color:#999;
+}
+h1{
+	font-size:140%;
+	margin:0 20px;
+	line-height:80px;	
+}
+#container{
+	margin:0 auto;
+	width:880px;
+	background:#fff;
+	padding-bottom:20px;
+}
+#content{margin:0 20px;}
+p{	
+	margin:0 auto;
+	width:680px;
+	padding:1em 0;
+}
+
+#htmlpage{width:300px;
+    height:150px;
+    overflow:auto;padding: 4px;
+    border:1px solid #EEE;border-right:0 solid;}
+#htmlsource  { width:300px;
+    height:150px;
+    overflow:auto;padding: 4px;
+    border:1px solid #EEE;border-right:0 solid;
+    background:#fff;
+}
+ 
+#report { border-collapse:collapse;}
+#report h4 { margin:0px; padding:0px;}
+#report img { float:right;}
+#report ul { margin:10px 0 10px 40px; padding:0px;}
+#report th { background:#7CB8E2 repeat-x scroll center left; color:#fff; padding:7px 15px; text-align:left;}
+#report td { background:#C7DDEE none repeat-x scroll center left; color:#000; padding:7px 15px; }
+#report tr.main td { background:transparent url('jquery/row_bkg.png') repeat-x scroll center left; cursor:pointer; }
+#report div.arrow { background:transparent scroll 0px -16px; width:16px; height:16px; display:block;}
+#report div.up { background-position:0px 0px;}
+
+
+</style> 
+ 
+</head> 
+ 
+<body> 
+
+<div id="container"> 
+	<h1>List Expander</h1> 
+	<div id="content"> 
+	
+	<table id="report">
+	    <tr>
+            <th>URL</th>
+            <th>POST data</th>
+            <th>Header fields</th>
+            <th>Parameters</th>
+            <th>Status code</th>
+	    <tr>
+		  <script type="text/javascript">
+
+		    function htmlspecialchars(str) {
+		    if (typeof(str) == "string") {
+		      str = str.replace(/&/g, "&amp;"); /* must do &amp; first */
+		      str = str.replace(/"/g, "&quot;");
+		      str = str.replace(/'/g, "&#039;");
+		      str = str.replace(/</g, "&lt;");
+		      str = str.replace(/>/g, "&gt;");
+		      }
+		    return str;
+		    }
+
+		    (function($){
+			$.fn.jExpand = function(){
+			    var element = this;
+
+			    $(element).find("tr:not(.main)").hide();
+			    $(element).find("tr:first-child").show();
+
+			    $(element).find("tr.main").click(function() {
+				$(this).nextUntil("tr.main").toggle();
+			    });
+			    
+			}    
+		    })(jQuery); 
+
+
+		    function formatObj(obj) {
+		      var r=''
+		      for(a in obj) {
+			  r = r + ' ' + a + ':' + obj[a] + ', ';
+		      }
+		      
+		      if(r.length>2)
+			return r.slice(0,r.length-2);
+		      return ' ';
+		    }
+
+		    for (resp in json) {
+
+
+			var htm = document.open(resp + '.html');
+		      
+			plural='y'
+			if(json[resp].length>1)
+			    plural='ies'
+
+
+			document.write('<tr class="main"><td colspan="6"> ' + json[resp].length + ' quer' + plural + ' have returned <a href="' + resp + '.html">' + resp + '.html</a> as response. </td></tr>');
+	
+			document.write('<tr><td colspan="3"><iframe id="htmlpage" src="' + resp + '.html"></iframe></td><td colspan="3"><div id="htmlsource">' + htmlspecialchars(htm.getElementsByTagName('html')[0].innerHTML) + '</div></td></tr>');
+
+			for(i=0;i<json[resp].length;i++) {
+			      document.write('<tr><td><a href ="' + json[resp][i][0] + '">' + json[resp][i][0] + '</a></td><td>' + formatObj(json[resp][i][1]) + '</td><td>' + formatObj(json[resp][i][2]) + '</td><td>' + json[resp][i][3].join(', ') + '</td><td>' + json[resp][i][4] + '</td></tr>');
+			}
+			
+		    }
+
+		  
+		  $("#report").jExpand(); 
+		  </script>
+	</table>
+	
+	</div> 
+</div> 
+	
+</body> 
+</html> 
