@@ -54,27 +54,31 @@ running = 0
 class outputHandler:
   
   hlist={}
+  realpath=''
   
   def __init__(self, path='.'):
     
     self.path=path
+    self.realpath=path
     
     ver=1
     while ver > 0:
       try:
 	os.mkdir(self.path)
       except OSError:
-	self.path=self.path + '-' + str(ver) +'/'
+	self.path=self.realpath + '-' + str(ver) +'/'
 	ver+=1
       else:
 	ver=-1
 
-    if path[:-1]!='/':
-      self.path=path + '/'
+    if self.path[-1]!='/':
+      self.path=self.path + '/'
     else:
-      self.path=path
+      self.path=self.path
 
     self.res=open(self.path + 'result.json','w+')
+    
+    print 'Created', self.path
     
   def log(self,req):
     
@@ -157,6 +161,7 @@ class requestList:
 
 	except Exception, e:
 	  print '! Error opening word lists: ' + str(e)
+	  raise
 	  return -1
 	
 
@@ -483,7 +488,9 @@ class webenum:
       out = outputHandler(resultpath)
     except Exception, e:
       print '! Error creating ' + resultpath + ' log directory: ' + str(e)
+      raise
       return -1
+      
       
     
     for i in range(0,threadsnum):
