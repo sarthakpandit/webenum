@@ -17,33 +17,27 @@ usage = version + """
 
 Usage:
 
-./webenum [-w wordlist] [-h header] [-d postdata] [-m match] url
+./webenum [-h header] [-d postdata] url
 
-URL, headers and POST data can contain:
+Replace URL, POST data and headers parts using dynamic strings:
 
-  %%WORD%%, get strings from internal wordlist of ~900 common words.
-  %%WORD[0-9]%% get strings from wordlist file paths specified in -w option.
-  %%INT%%, generate integer ranges. Default: from 0 to 50.
-  %%CHAR%%, generate character and string ranges. Default: from 'a' to 'z'.
-  %%TABLE%%, generate 1,1,..,1 string, useful for SQL injection. Default: from 0 to 50.
+  ./webenum "http://www.target.com/query?param1=123,param2=[[wl:wordlist.txt]]"
+  ./webenum "http://www.target.com/query" -d "param=[[int:100]]" -h "Referer:[[wl:referers-wordlist.txt]]"
 
-  INT, CHAR and TABLE can be customized using [end] or [start]:[end], like %%INT4%% or %%CHARaa:zz%%.
+  [[wl:wordlist.txt]]	load strings from a wordlist file.
+  [[int:1:10]]		generate integer ranges. Default: from 0 to 50.
+  [[char:aaa:zzz]]	generate string ranges. Default: from 'a' to 'z'.
+  [[table:1:20]]	generate NULL,..,NULL strings to exploit SQL injection. Default: from 0 to 50 unos.
 
-Match (-m)
+Match notable response 
 
-  To match correct responses, are supported little Python statements. HTTP Variables are response and status_code:
-  "'Logged' in response and status_code == 200"
-  "'Wrong password' in response"
-
-POST datas (-d), headers (-h) and wordlists (-w):
-
-  -d "param1=value" -d "param2=value" -d "param3=%%WORD%%"
-  -h "User-Agent:Mozilla Firefox %%INT4:12%%.0" -h "Referer:%%WORD1%%"
-  -w users.txt -w password.txt
+  -m 'response.contains("correct login") and code != 404'
+  -m 'not response.containsre(".*correct login.*") or code == 200'
   
 """
 
 requestlistlock = threading.Lock()
+outputlock = threading.Lock()
 time2die = False
 running = 0
 
@@ -76,9 +70,8 @@ class outputHandler:
     else:
       self.path=self.path
 
-    self.res=open(self.path + 'result.json','w+')
     
-    print 'Created', self.path
+    print '+ Results saved in ' + self.path + 'results.html'
     
   def log(self,req):
     
@@ -88,11 +81,17 @@ class outputHandler:
     
     if h not in self.hlist:
       f=open(self.path + h + '.html', 'w')
-      self.hlist[h]=[ req.url, req.data, req.head, req.params, req.status, req.error ]
+      f.write(req.response)
+      f.close()
+      self.hlist[h]=[[ req.url, req.data, req.head, req.params, req.status, req.error ]]
       return h
+    else:
+      self.hlist[h].append([ req.url, req.data, req.head, req.params, req.status, req.error ])
     
-    self.res.truncate(0)
-    self.res.write(json.dumps(self.hlist))
+
+    self.res=open(self.path + 'result.js','w')
+    self.res.write('var json = eval(\'(' + json.dumps(self.hlist) + ')\');\n')
+    self.res.close()
     
     return ''
     
@@ -253,8 +252,6 @@ class requestList:
 	  
 	  self.combfuzzed.append(topush)
 
-    
-    print '+ Fuzz ' + str(len(self.fuzz)) + ' parameters with ' + str(len(self.combfuzzed)) + ' requests.'
 
 
   
@@ -351,7 +348,14 @@ class reqthread ( threading.Thread ):
 
       req=self.httpget(newreq)
       
-      print '+ ' + self.name + '> [ ' + ' ][ '.join(req.params) + ' ]' + ' ... response status code: ' + str(req.status) + ' size: ' + prettySize(len(req.response)) + ' ' + str(self.out.log(req))
+      outputlock.acquire()
+      outfile = str(self.out.log(req))
+      outputlock.release()
+      if outfile:
+	outfile= 'new output saved in ' + outfile + '.html'
+      
+      
+      print '+ ' + self.name + '> [ ' + ' ][ '.join(req.params) + ' ]' + ' ... status: ' + str(req.status) + ' size: ' + prettySize(len(req.response)) + ' ' + outfile
     
   
     #if response:
@@ -365,6 +369,15 @@ class reqthread ( threading.Thread ):
 	#print '... doesn\'t match. [' + str(status_code) + ']',
       
     #print ''
+
+  #class evaluated_resp:
+    #def __init__(self,resp):
+      #self.r=resp
+    #def contains(self,what):
+      #return what is in self.r
+    #def containsre(self,what):
+      #pass
+      
 
   def httpget(self, req, r = None):
     
@@ -483,6 +496,8 @@ class webenum:
       print '+ Using HTTP proxy ' + urllib2.getproxies()['http']
 
     self.reqlist=requestList(url, data, headers, cookiepath)
+    
+    print '+ Covering ' + str(len(self.reqlist.combfuzzed)) + ' requests with ' + str(threadsnum) + ' thread/s'
     
     try:
       out = outputHandler(resultpath)
