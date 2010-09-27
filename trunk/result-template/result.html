@@ -4,7 +4,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
 <title>List Expander</title> 
  
-<link href="listexpander/listexpander.css" rel="stylesheet" type="text/css" media="screen" /> 
 <script type="text/javascript" src="jquery/jquery.js"></script> 
 <script type="text/javascript" src="result.js"></script> 
 
@@ -16,7 +15,7 @@ body{
 	margin:0;
 	padding:0;
 	background:#f1f1f1;
-	font:70% Arial, Helvetica, sans-serif; 
+	font:80% Arial, Helvetica, sans-serif; 
 	color:#555;
 	line-height:150%;
 	text-align:left;
@@ -47,25 +46,24 @@ p{
 	padding:1em 0;
 }
 
-#htmlpage{width:300px;
+#htmlpage{width:350px;
     height:150px;
     overflow:auto;padding: 4px;
     border:1px solid #EEE;border-right:0 solid;}
-#htmlsource  { width:300px;
+#htmlsource  { width:350px;
     height:150px;
     overflow:auto;padding: 4px;
     border:1px solid #EEE;border-right:0 solid;
     background:#fff;
 }
- 
-#report { border-collapse:collapse;}
+
+#report { border-collapse:collapse; width:800px; }
 #report h4 { margin:0px; padding:0px;}
-#report img { float:right;}
 #report ul { margin:10px 0 10px 40px; padding:0px;}
-#report th { background:#7CB8E2 repeat-x scroll center left; color:#fff; padding:7px 15px; text-align:left;}
-#report td { background:#C7DDEE none repeat-x scroll center left; color:#000; padding:7px 15px; }
+#report th { background:#7CB8E2 url('jquery/header_bkg.png') repeat-x scroll center left; color:#fff; padding:7px 15px; text-align:left;}
+#report td { border:#000; background:#C7DDEE none repeat-x scroll center left; color:#000; padding:7px 15px; }
 #report tr.main td { background:transparent url('jquery/row_bkg.png') repeat-x scroll center left; cursor:pointer; }
-#report div.arrow { background:transparent scroll 0px -16px; width:16px; height:16px; display:block;}
+#report div.arrow { background:transparent url('jquery/arrows.png') no-repeat scroll 0px -16px; width:16px; height:16px; display:block;}
 #report div.up { background-position:0px 0px;}
 
 
@@ -76,7 +74,7 @@ p{
 <body> 
 
 <div id="container"> 
-	<h1>List Expander</h1> 
+	<h1>WebEnum</h1> 
 	<div id="content"> 
 	
 	<table id="report">
@@ -114,7 +112,7 @@ p{
 			}    
 		    })(jQuery); 
 
-
+	
 		    function formatObj(obj) {
 		      var r=''
 		      for(a in obj) {
@@ -136,7 +134,7 @@ p{
 			    plural='ies'
 
 
-			document.write('<tr class="main"><td colspan="6"> ' + json[resp].length + ' quer' + plural + ' have returned <a href="' + resp + '.html">' + resp + '.html</a> as response. </td></tr>');
+			document.write('<tr class="main"><td colspan="1"><div class="arrow"></td><td colspan="6"> ' + json[resp].length + ' quer' + plural + ' have returned <a href="' + resp + '.html">' + resp + '.html</a> as response. </td></tr>');
 	
 			document.write('<tr><td colspan="3"><iframe id="htmlpage" src="' + resp + '.html"></iframe></td><td colspan="3"><div id="htmlsource">' + htmlspecialchars(htm.getElementsByTagName('html')[0].innerHTML) + '</div></td></tr>');
 
