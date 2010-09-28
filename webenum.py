@@ -73,6 +73,10 @@ class outputHandler:
     
     print '+ Results saved in ' + self.path + 'results.html'
     
+  def slashHTML(self,html):
+    return html.replace('&','&amp;').replace('"',"&quot;").replace('\'',"&#039;").replace('<',"&lt;").replace('>',"&gt;").replace('\n','')
+    
+    
   def log(self,req):
     
     h = str(hash(req.response))
@@ -83,10 +87,10 @@ class outputHandler:
       f=open(self.path + h + '.html', 'w')
       f.write(req.response)
       f.close()
-      self.hlist[h]=[[ req.url, req.data, req.head, req.params, req.status, req.error ]]
+      self.hlist[h]=[[ req.url, req.data, req.head, req.params, req.status, req.error, self.slashHTML(req.response) ]]
       return h
     else:
-      self.hlist[h].append([ req.url, req.data, req.head, req.params, req.status, req.error ])
+      self.hlist[h].append([ req.url, req.data, req.head, req.params, req.status, req.error, self.slashHTML(req.response) ])
     
 
     self.res=open(self.path + 'result.js','w')
