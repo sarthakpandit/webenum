@@ -90,9 +90,8 @@ class outputHandler:
       self.hlist[h]=[[ req.url, req.data, req.head, req.params, req.status, req.error, self.slashHTML(req.response) ]]
       return h
     else:
-      self.hlist[h].append([ req.url, req.data, req.head, req.params, req.status, req.error, self.slashHTML(req.response) ])
+      self.hlist[h].append([ req.url, req.data, req.head, req.params, req.status, req.error])
     
-
     self.res=open(self.path + 'result.js','w')
     self.res.write('var json = eval(\'(' + json.dumps(self.hlist) + ')\');\n')
     self.res.close()
