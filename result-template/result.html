@@ -23,6 +23,10 @@ h1{
 	margin:0 20px;
 	line-height:80px;	
 }
+h2{
+	font-size:120%;
+	line-height:10px;	
+}
 #container{
 	margin:0 auto;
 	width:880px;
@@ -165,7 +169,7 @@ table a:hover {
 
 			document.write('<tr class="main"><td colspan="6"><strong> ' + json[resp].length + ' quer' + plural + ' returned <a href="' + resp + '.html">' + resp + '.html</a> as response. </strong></td></tr>');
 	
-			document.write('<tr><td colspan="3"><iframe id="htmlpage" src="' + resp + '.html"></iframe></td><td colspan="3"><div id="htmlsource">' + htmlspecialchars(htm.getElementsByTagName('html')[0].innerHTML) + '</div></td></tr>');
+			document.write('<tr><td colspan="3"><h2>HTTP response code</h2><div id="htmlsource">' + json[resp][0][6] + '</div></td><td colspan="3"><h2>Click to visualize response page.</h2><div id="htmlpage"></div></td></tr>');
 
 			document.write('<tr class="head"><td>Fuzz strings</td><td>URL</td><td>POST data</td><td>Headers</td><td>Status code</td></tr>');
 
